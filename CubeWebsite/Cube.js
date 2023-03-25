@@ -4,6 +4,7 @@ var number;
 var counter;
 var min = 1;
 var max = 24;
+var sideCounts = [0, 0, 0, 0, 0, 0];
 
 var i = 0;
 var txt = 'Times Rolled';
@@ -17,24 +18,66 @@ function typeWriter() {
   }
 }
 
-
 function Totalincrement() {
   number = parseInt(value.innerText);
   counter = number + 1
   var value1 = counter++
   value.innerText = value1
- }
+}
+
+function getSideFromRotation(x, y) {
+  const facesRotations = [
+    { x: 0, y: 0 },
+    { x: 180, y: 0 },
+    { x: 90, y: 0 },
+    { x: 270, y: 0 },
+    { x: 0, y: 90 },
+    { x: 0, y: 270 },
+  ];
+
+  const normalizedRotation = {
+    x: ((x % 360) + 360) % 360,
+    y: ((y % 360) + 360) % 360,
+};
+
+const faceIndex = facesRotations.findIndex(
+  (rotation) =>
+    rotation.x === normalizedRotation.x && rotation.y === normalizedRotation.y
+);
+
+return faceIndex + 1;
+}
+
+function updateSideCounts(side) {
+sideCounts[side - 1]++;
+displaySideCounts();
+}
+
+function displaySideCounts() {
+var sideCountsContainer = document.getElementById('sideCounts');
+sideCountsContainer.innerHTML = '';
+
+sideCounts.forEach(function (count, index) {
+  var sideCountDiv = document.createElement('div');
+  sideCountDiv.innerHTML = `Side ${index + 1}: ${count}`;
+  sideCountsContainer.appendChild(sideCountDiv);
+});
+}
+
 cube.onclick = function() {
-  var xRand = getRandom(max, min);
-  var yRand = getRandom(max, min);
-  cube.style = 'rotateX('+xRand+'deg) rotateY('+yRand+'deg)';
-  cube.style.transform = 'rotateX('+xRand+'deg) rotateY('+yRand+'deg)';
-  Totalincrement();
-  typeWriter();
+var xRand = getRandom(max, min);
+var yRand = getRandom(max, min);
+cube.style = 'rotateX('+xRand+'deg) rotateY('+yRand+'deg)';
+cube.style.transform = 'rotateX('+xRand+'deg) rotateY('+yRand+'deg)';
+Totalincrement();
+typeWriter();
+
+var side = getSideFromRotation(xRand, yRand);
+updateSideCounts(side);
 }
 
 function getRandom(max, min) {
-  return (Math.floor(Math.random() * (max-min)) + min) * 90;
+return (Math.floor(Math.random() * (max-min)) + min) * 90;
 }
 
 //This is a function which will Drag an Element
@@ -81,3 +124,7 @@ function dragElement(elmnt)
     document.onmousemove = null;
   }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  displaySideCounts();
+});
